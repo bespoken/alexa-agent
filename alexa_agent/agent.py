@@ -11,10 +11,12 @@ AUDIO_DIR = BASE_DIR + '/audio'
 
 class AlexaAgent(object):
     def __init__(self):
-        self.audio_dir = AUDIO_DIR        
+        print "Hello"
+	self.audio_dir = AUDIO_DIR        
     
     def wakeup(self):
-        self.play_mp3("{}/wakeup.mp3".format(self.audio_dir))
+        print self.audio_dir
+	self.play_mp3("{}/wakeup.mp3".format(self.audio_dir))
 
     def say(self, input):
         """Alexa will say the text.
@@ -61,10 +63,34 @@ class AlexaAgent(object):
         if no_play:
             return output_list
         if len(output_list) > 1:
-            self.play_mp3(output_list[0], output_list[1:])
+            self.speech_to_text(output_list[0], output_list[1:])
         else:
-            self.play_mp3(output_list[0])
+            self.speech_to_text(output_list[0])
         alexa.clean()
+
+    def speech_to_text(self, filename):
+	import speech_recognition as sr
+
+	# obtain path to "english.wav" in the same folder as this script
+	from os import path
+
+	wav_file = filename + ".wav"
+	from pydub import AudioSegment
+	AudioSegment.from_mp3(filename).export(wav_file, format="wav")
+	
+	# use the audio file as the audio source
+	r = sr.Recognizer()
+	with sr.AudioFile(wav_file) as source:
+    	    audio = r.record(source) # read the entire audio file
+
+	WIT_AI_KEY = "3S4FE6EQEVKKQT2GLEJV3XFYHKUW2FYX" # Wit.ai keys are 32-character uppercase alphanumeric strings
+	try:
+    	    print("Wit.ai thinks you said " + r.recognize_wit(audio, key=WIT_AI_KEY))
+	except sr.UnknownValueError:
+    	    print("Wit.ai could not understand audio")
+	except sr.RequestError as e:
+    	    print("Could not request results from Wit.ai service; {0}".format(e))
+	
 
     def play_mp3(self, filename, addl_filenames=[], pause=True):
         """Plays MP3 file(s).
