@@ -11,7 +11,7 @@ AUDIO_DIR = BASE_DIR + '/audio'
 
 class AlexaAgent(object):
     def __init__(self):
-        print "Hello"
+        print "Hello" + AUDIO_DIR
 	self.audio_dir = AUDIO_DIR        
     
     def wakeup(self):
@@ -60,12 +60,13 @@ class AlexaAgent(object):
         text_list = [text] + addl_text_list
         input_list = [tts(t) for t in text_list]
         output_list = alexa.ask(user_id, input_list[0])
+
         if no_play:
             return output_list
         if len(output_list) > 1:
-            self.speech_to_text(output_list[0], output_list[1:])
+            self.speech_to_text(output_list)
         else:
-            self.speech_to_text(output_list[0])
+            self.speech_to_text(output_list)
         alexa.clean()
 
     def speech_to_text(self, filename):
@@ -74,6 +75,7 @@ class AlexaAgent(object):
 	# obtain path to "english.wav" in the same folder as this script
 	from os import path
 
+	print("STT: " + filename)
 	wav_file = filename + ".wav"
 	from pydub import AudioSegment
 	AudioSegment.from_mp3(filename).export(wav_file, format="wav")
