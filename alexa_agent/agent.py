@@ -32,21 +32,21 @@ class AlexaAgent(object):
         else:
             self.send_to_alexa(text=input)
 
-    def ask(self, input):
+    def ask(self, user_id, input):
         """Ask Alexa to do something(s).
         
         @param: input: Text command you want to send to Alexa.
         @type: input: str or list of str
         """
         if isinstance(input, list):
-            self.send_to_alexa(
+            self.send_to_alexa(user_id,
                 text=input[0],
                 addl_text_list=input[1:]
             )
         else:
-            self.send_to_alexa(text=input)
+            self.send_to_alexa(user_id, text=input)
     
-    def send_to_alexa(self, text, addl_text_list=[], no_play=False):
+    def send_to_alexa(self, user_id, text, addl_text_list=[], no_play=False):
         """Send text to Alexa. If addl_text_list is provided, all the text
         commands will be sent concurrently and responses played back in order.
 
@@ -59,7 +59,7 @@ class AlexaAgent(object):
         alexa = AlexaClient()
         text_list = [text] + addl_text_list
         input_list = [tts(t) for t in text_list]
-        output_list = alexa.ask_multiple(input_list)
+        output_list = alexa.ask(user_id, input_list[0])
         if no_play:
             return output_list
         if len(output_list) > 1:
